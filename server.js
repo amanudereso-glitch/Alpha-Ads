@@ -10,7 +10,7 @@ const bot = new TelegramBot(TOKEN, { polling: true });
 const app = express();
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Check channel membership helper
 async function checkMembership(userId) {
@@ -26,13 +26,12 @@ async function checkMembership(userId) {
 // Bot start command
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
-  const isJoined = await checkMembership(chatId);
 
   const opts = {
     reply_markup: {
       inline_keyboard: [
         [{ text: '📢 Join Channel', url: 'https://t.me/alpha_ads_earn' }],
-        [{ text: '🚀 Open Alpha Ads Earn', web_app: { url: `https://your-render-app-url.onrender.com?userId=${chatId}` } }]
+        [{ text: '🚀 Open Alpha Ads Earn', web_app: { url: `https://alpha-ads.onrender.com?userId=${chatId}` } }]
       ]
     }
   };
@@ -59,7 +58,6 @@ app.post('/api/withdraw', async (req, res) => {
     return res.json({ success: false, message: 'Minimum withdrawal amount is 50 ETB!' });
   }
 
-  // Send withdrawal request to admin
   const adminMessage = `🚨 **New Withdrawal Request**\n\n👤 User: @${username || 'N/A'} (ID: \`${userId}\`)\n💰 Amount: \`${amount} ETB\`\n📺 Ads Watched: \`${adsWatched}/30\`\n💳 Method: \`${method}\`\n📋 Account: \`${account}\``;
 
   try {
