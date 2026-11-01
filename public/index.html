@@ -228,7 +228,6 @@
             cursor: pointer;
         }
 
-        /* Profile Specific Styles */
         .ref-box {
             background: #0b131e;
             padding: 10px 14px;
@@ -419,14 +418,12 @@
         <!-- PROFILE / WITHDRAW TAB -->
         <div id="tab-profile" class="tab-content hidden">
             
-            <!-- AVAILABLE BALANCE CARD -->
             <div class="card">
                 <div class="balance-title">AVAILABLE BALANCE</div>
                 <div class="balance-amount" id="profile-balance">0.00 ETB</div>
                 <div class="lifetime-text">📈 Lifetime: <span id="profile-lifetime">0.00 ETB</span></div>
             </div>
 
-            <!-- SNI BALANCE CARD -->
             <div class="card">
                 <div class="balance-header">
                     <span class="balance-title">SNI BALANCE</span>
@@ -445,7 +442,6 @@
                 <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 12px;">Convert Sni to ETB on the Earn page</p>
             </div>
 
-            <!-- REFER & EARN CARD -->
             <div class="card">
                 <h3>Refer & Earn</h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share your link and earn 3.00 ETB per valid referral.</p>
@@ -468,7 +464,6 @@
                 </div>
             </div>
 
-            <!-- WITHDRAW FUNDS CARD -->
             <div class="card">
                 <h3>Withdraw Funds</h3>
                 <div style="font-size: 12px; color: #ff6b6b; margin-bottom: 12px; line-height: 1.5;">
@@ -533,11 +528,10 @@
             withdrawn: 0.00,
             adsWatched: 0,
             validReferrals: 0,
-            pendingReferrals: 2, // Pending referral simulation (unpaid/haven't watched ads)
+            pendingReferrals: 2,
             currency: 'ETB'
         };
 
-        // Set referral link dynamically based on user ID
         const botUsername = "alpha_ads_earn_bot";
         const refLink = `https://t.me/${botUsername}/app?start=${user.id}`;
         document.getElementById('ref-link-text').innerText = refLink;
@@ -552,8 +546,8 @@
             window.open(shareUrl, '_blank');
         }
 
-        // Initialize Adsgram (Replace 'YOUR_BLOCK_ID' with your actual Adsgram block ID)
-        const adController = window.Adsgram ? window.Adsgram.init({ blockId: "YOUR_BLOCK_ID" }) : null;
+        // Adsgram initialized with Block ID: 57309
+        const adController = window.Adsgram ? window.Adsgram.init({ blockId: "57309" }) : null;
 
         async function checkMembership() {
             try {
@@ -606,11 +600,10 @@
             state.earningWallet += 0.40;
             state.totalEarned += 0.40;
             
-            // If user has pending referrals who just became valid by watching ads (simulated rule: valid referral gives 3 ETB)
             if(state.pendingReferrals > 0 && state.adsWatched >= 1) {
                 state.validReferrals += 1;
                 state.pendingReferrals -= 1;
-                state.mainBalance += 3.00; // 3 ETB per valid referral added to balance
+                state.mainBalance += 3.00;
             }
 
             updateUI();
