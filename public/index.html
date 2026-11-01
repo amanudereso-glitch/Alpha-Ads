@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alpha Ads Earn</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Adsgram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
         :root {
             --bg-color: #0b131e;
@@ -35,7 +37,6 @@
         }
         .hidden { display: none !important; }
         
-        /* Top Header Bar */
         .top-header {
             display: flex;
             justify-content: space-between;
@@ -72,7 +73,6 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Cards */
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -95,7 +95,6 @@
             font-weight: 600;
         }
         
-        /* Currency Toggle */
         .toggle-container {
             background: #0b131e;
             display: flex;
@@ -124,7 +123,6 @@
             margin: 5px 0 15px 0;
         }
 
-        /* Action Buttons Grid */
         .action-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -145,6 +143,9 @@
             gap: 8px;
             transition: 0.2s;
         }
+        .btn-green {
+            background: linear-gradient(135deg, #00c853, #009624);
+        }
         .btn-secondary {
             background: #1e293b;
             color: var(--text-color);
@@ -152,7 +153,6 @@
         }
         .btn:active { transform: scale(0.98); }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -174,7 +174,6 @@
             font-weight: bold;
         }
 
-        /* Inputs & Select */
         input, select {
             width: 100%;
             padding: 14px;
@@ -191,7 +190,27 @@
             outline: none;
         }
 
-        /* Navigation Bar */
+        /* Task Item Specifics */
+        .task-item-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0b131e;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .badge-ready {
+            background: var(--green-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -239,7 +258,6 @@
     <!-- Main App Screen -->
     <div id="app-screen" class="container hidden">
         
-        <!-- Top Header matching design -->
         <div class="top-header">
             <div class="user-badge">
                 🏛 ∇ <span id="username-display">RICHARD</span> ∇ $
@@ -262,7 +280,7 @@
                 </div>
                 <div class="balance-amount" id="balance">0.00 ETB</div>
                 <div class="action-grid">
-                    <button class="btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💳 Withdraw</button>
+                    <button class="btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[2])">💳 Withdraw</button>
                     <button class="btn btn-secondary" onclick="alert('No transaction history yet.')">📜 History</button>
                 </div>
             </div>
@@ -290,9 +308,38 @@
         <!-- TASKS TAB -->
         <div id="tab-tasks" class="tab-content hidden">
             <div class="card">
-                <h3>Watch Ads & Earn</h3>
-                <p style="color: var(--text-muted); font-size: 13px;">Earn 0.40 ETB per ad watched. Minimum 30 ads required for withdrawal.</p>
-                <button class="btn" style="width: 100%; margin-top: 15px;" onclick="watchAd()">▶ Watch Ad</button>
+                <h3>Tasks</h3>
+                <p style="color: var(--text-muted); font-size: 13px;">Complete tasks to earn extra ETB</p>
+                <div style="margin-top: 15px; font-size: 13px; color: var(--text-muted);">Today's Ads: <span id="task-ads-count" style="color: white; font-weight: bold;">0 / 30</span></div>
+            </div>
+
+            <div class="card">
+                <div class="balance-header">
+                    <span class="balance-title">EARNING WALLET</span>
+                </div>
+                <div class="balance-amount" id="earning-wallet">0.00 ETB</div>
+                <p style="font-size: 12px; color: var(--text-muted);">From ads, tasks, and milestones</p>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                    <span>➔ Move to Wallet</span>
+                    <span id="move-status">0.00 / 10 ETB</span>
+                </div>
+                <button class="btn btn-green" id="move-btn" style="width: 100%; opacity: 0.6; cursor: not-allowed;" onclick="moveToMainWallet()" disabled>Earn 10.00 more ETB to unlock</button>
+                <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px;">Minimum: 10 ETB</div>
+            </div>
+
+            <div class="card">
+                <div style="font-weight: bold; margin-bottom: 4px;">Watch Ads and Earn</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">0.40 ETB per ad</div>
+                <div class="task-item-box">
+                    <div style="font-size: 13px;">
+                        <div style="font-weight: bold;">Watch Ads and Earn</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">All enabled platforms • 0.40 ETB per ad</div>
+                    </div>
+                    <div class="badge-ready" onclick="watchAd()">READY</div>
+                </div>
             </div>
         </div>
 
@@ -338,12 +385,16 @@
         }
 
         let state = {
-            balance: 0.00,
-            earned: 0.00,
+            mainBalance: 0.00,
+            earningWallet: 0.00,
+            totalEarned: 0.00,
             adsWatched: 0,
             referrals: 2,
             currency: 'ETB'
         };
+
+        // Initialize Adsgram (Replace 'YOUR_BLOCK_ID' with your actual Adsgram block ID)
+        const adController = window.Adsgram ? window.Adsgram.init({ blockId: "YOUR_BLOCK_ID" }) : null;
 
         async function checkMembership() {
             try {
@@ -375,24 +426,71 @@
             updateUI();
         }
 
-        function watchAd() {
+        async function watchAd() {
+            if (!adController) {
+                // Fallback simulation if SDK fails to load locally
+                processAdReward();
+                return;
+            }
+
+            try {
+                await adController.show();
+                processAdReward();
+            } catch (error) {
+                alert('ማስታወቂያውን እስከ መጨረሻው አልጨረሱም ወይም ማስታወቂያ ማሳየት አልተቻለም!');
+            }
+        }
+
+        function processAdReward() {
             state.adsWatched += 1;
-            state.balance += 0.40;
-            state.earned += 0.40;
+            state.earningWallet += 0.40;
+            state.totalEarned += 0.40;
             updateUI();
-            alert('Ad watched successfully! 0.40 ETB added.');
+            alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
+        }
+
+        function moveToMainWallet() {
+            if (state.earningWallet < 10) {
+                alert('ቢያንስ 10 ETB መሙላት አለብዎት!');
+                return;
+            }
+            state.mainBalance += state.earningWallet;
+            state.earningWallet = 0.00;
+            updateUI();
+            alert('ገንዘቡ በተሳካ ሁኔታ ወደ ዋናው ባላንስ ተዛውሯል!');
         }
 
         function updateUI() {
-            let displayVal = state.balance;
+            let displayVal = state.mainBalance;
             let currSymbol = state.currency;
             if(state.currency === 'USDT') {
-                displayVal = state.balance / 120; // approximate conversion or raw value
+                displayVal = state.mainBalance / 120;
             }
+            
             document.getElementById('balance').innerText = displayVal.toFixed(2) + ' ' + currSymbol;
-            document.getElementById('total-earned').innerText = state.earned.toFixed(2) + ' ETB';
+            document.getElementById('earning-wallet').innerText = state.earningWallet.toFixed(2) + ' ETB';
+            document.getElementById('total-earned').innerText = state.totalEarned.toFixed(2) + ' ETB';
             document.getElementById('ads-watched').innerText = state.adsWatched + ' / 30';
+            document.getElementById('task-ads-count').innerText = state.adsWatched + ' / 30';
             document.getElementById('ref-count').innerText = state.referrals;
+
+            // Move to wallet unlock logic (Minimum 10 ETB)
+            const moveBtn = document.getElementById('move-btn');
+            const moveStatus = document.getElementById('move-status');
+            moveStatus.innerText = state.earningWallet.toFixed(2) + ' / 10 ETB';
+
+            if (state.earningWallet >= 10) {
+                moveBtn.disabled = false;
+                moveBtn.style.opacity = '1';
+                moveBtn.style.cursor = 'pointer';
+                moveBtn.innerText = 'Move to Wallet';
+            } else {
+                moveBtn.disabled = true;
+                moveBtn.style.opacity = '0.6';
+                moveBtn.style.cursor = 'not-allowed';
+                let needed = (10 - state.earningWallet).toFixed(2);
+                moveBtn.innerText = `Earn ${needed} more ETB to unlock`;
+            }
         }
 
         async function requestWithdraw() {
@@ -415,8 +513,8 @@
                 return;
             }
 
-            if (amount > state.balance) {
-                alert('Insufficient balance!');
+            if (amount > state.mainBalance) {
+                alert('Insufficient main balance!');
                 return;
             }
 
@@ -436,7 +534,7 @@
             const data = await res.json();
             alert(data.message);
             if (data.success) {
-                state.balance -= amount;
+                state.mainBalance -= amount;
                 updateUI();
             }
         }
