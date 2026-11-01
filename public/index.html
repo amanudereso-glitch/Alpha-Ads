@@ -89,7 +89,7 @@
             margin-bottom: 10px;
         }
         .balance-title {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 1px;
             font-weight: 600;
@@ -120,7 +120,16 @@
         .balance-amount {
             font-size: 32px;
             font-weight: bold;
-            margin: 5px 0 15px 0;
+            margin: 5px 0 5px 0;
+        }
+
+        .lifetime-text {
+            font-size: 12px;
+            color: var(--green-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .action-grid {
@@ -129,7 +138,7 @@
             gap: 10px;
         }
         .btn {
-            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            background: linear-gradient(135deg, #00c853, #009624);
             color: white;
             border: none;
             padding: 12px;
@@ -142,9 +151,6 @@
             justify-content: center;
             gap: 8px;
             transition: 0.2s;
-        }
-        .btn-green {
-            background: linear-gradient(135deg, #00c853, #009624);
         }
         .btn-secondary {
             background: #1e293b;
@@ -165,13 +171,26 @@
             border: 1px solid rgba(255,255,255,0.03);
         }
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
         .stat-value {
             font-size: 18px;
             font-weight: bold;
+        }
+
+        /* 7-Day Chart Placeholder */
+        .chart-days {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
         }
 
         input, select {
@@ -190,7 +209,6 @@
             outline: none;
         }
 
-        /* Task Item Specifics */
         .task-item-box {
             display: flex;
             justify-content: space-between;
@@ -228,7 +246,7 @@
         .nav-item {
             color: var(--text-muted);
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -260,10 +278,10 @@
         
         <div class="top-header">
             <div class="user-badge">
-                🏛 ∇ <span id="username-display">AMAN_ORGINALL_1</span> ∇ $
+                🏛 ∇ <span id="username-display">RICHARD</span> ∇ $
             </div>
             <div class="header-icons">
-                <button class="icon-btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[2])">💬</button>
+                <button class="icon-btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💬</button>
                 <button class="icon-btn" onclick="alert('Settings & Info')">⚙️</button>
             </div>
         </div>
@@ -279,12 +297,15 @@
                     </div>
                 </div>
                 <div class="balance-amount" id="balance">0.00 ETB</div>
+                <div class="lifetime-text">📈 Lifetime: <span id="lifetime-val">0.00 ETB</span></div>
+                
                 <div class="action-grid">
-                    <button class="btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[2])">💳 Withdraw</button>
+                    <button class="btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💳 Withdraw</button>
                     <button class="btn btn-secondary" onclick="alert('No transaction history yet.')">📜 History</button>
                 </div>
             </div>
 
+            <!-- Stats Grid matching design -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">TOTAL EARNED</div>
@@ -292,7 +313,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">TODAY'S ADS</div>
-                    <div class="stat-value" id="ads-watched">0 / 30</div>
+                    <div class="stat-value" id="ads-watched">0</div>
                 </div>
                 <div class="stat-card" style="margin-top: 12px;">
                     <div class="stat-label">REFERRALS</div>
@@ -300,7 +321,21 @@
                 </div>
                 <div class="stat-card" style="margin-top: 12px;">
                     <div class="stat-label">WITHDRAWN</div>
-                    <div class="stat-value">0.00 ETB</div>
+                    <div class="stat-value" id="withdrawn-val">0.00 ETB</div>
+                </div>
+            </div>
+
+            <!-- 7-Day Earnings Card -->
+            <div class="card" style="margin-top: 15px;">
+                <div class="balance-title" style="margin-bottom: 5px;">7-DAY EARNINGS</div>
+                <div class="chart-days">
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                    <span>Sun</span>
                 </div>
             </div>
         </div>
@@ -326,11 +361,10 @@
                     <span>➔ Move to Wallet</span>
                     <span id="move-status">0.00 / 10 ETB</span>
                 </div>
-                <button class="btn btn-green" id="move-btn" style="width: 100%; opacity: 0.6; cursor: not-allowed;" onclick="moveToMainWallet()" disabled>Earn 10.00 more ETB to unlock</button>
+                <button class="btn" id="move-btn" style="width: 100%; opacity: 0.6; cursor: not-allowed; background: #1e293b;" onclick="moveToMainWallet()" disabled>Earn 10.00 more ETB to unlock</button>
                 <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px;">Minimum: 10 ETB</div>
             </div>
 
-            <!-- Watch Ads Section -->
             <div class="card">
                 <div style="font-weight: bold; margin-bottom: 4px;">Watch Ads and Earn</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">0.40 ETB per ad</div>
@@ -343,8 +377,7 @@
                     <div class="badge-ready" onclick="watchAd()">READY</div>
                 </div>
 
-                <!-- Big Main Watch Ads Button -->
-                <button class="btn btn-green" style="width: 100%; margin-top: 15px; padding: 14px; font-size: 16px;" onclick="watchAd()">
+                <button class="btn" style="width: 100%; margin-top: 15px; padding: 14px; font-size: 16px;" onclick="watchAd()">
                     ▶ Watch Ads
                 </button>
             </div>
@@ -374,6 +407,9 @@
             <div class="nav-item" onclick="switchTab('tasks', this)">
                 <span>📋</span> Tasks
             </div>
+            <div class="nav-item" onclick="switchTab('ranks', this)">
+                <span>📊</span> Ranks
+            </div>
             <div class="nav-item" onclick="switchTab('profile', this)">
                 <span>👤</span> Profile
             </div>
@@ -385,7 +421,7 @@
         tg.expand();
         const urlParams = new URLSearchParams(window.location.search);
         const userIdFromUrl = urlParams.get('userId');
-        const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'AMAN_ORGINALL_1' };
+        const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'RICHARD' };
 
         if(user.username) {
             document.getElementById('username-display').innerText = user.username.toUpperCase();
@@ -395,6 +431,7 @@
             mainBalance: 0.00,
             earningWallet: 0.00,
             totalEarned: 0.00,
+            withdrawn: 0.00,
             adsWatched: 0,
             referrals: 0,
             currency: 'ETB'
@@ -422,7 +459,9 @@
         function switchTab(tabName, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            if(document.getElementById(`tab-${tabName}`)) {
+                document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            }
             el.classList.add('active');
         }
 
@@ -435,7 +474,6 @@
 
         async function watchAd() {
             if (!adController) {
-                // Fallback simulation if SDK fails to load locally
                 processAdReward();
                 return;
             }
@@ -475,11 +513,13 @@
             }
             
             document.getElementById('balance').innerText = displayVal.toFixed(2) + ' ' + currSymbol;
-            document.getElementById('earning-wallet').innerText = state.earningWallet.toFixed(2) + ' ETB';
+            document.getElementById('lifetime-val').innerText = state.totalEarned.toFixed(2) + ' ' + currSymbol;
             document.getElementById('total-earned').innerText = state.totalEarned.toFixed(2) + ' ETB';
-            document.getElementById('ads-watched').innerText = state.adsWatched + ' / 30';
+            document.getElementById('earning-wallet').innerText = state.earningWallet.toFixed(2) + ' ETB';
+            document.getElementById('ads-watched').innerText = state.adsWatched;
             document.getElementById('task-ads-count').innerText = state.adsWatched + ' / 30';
             document.getElementById('ref-count').innerText = state.referrals;
+            document.getElementById('withdrawn-val').innerText = state.withdrawn.toFixed(2) + ' ETB';
 
             // Move to wallet unlock logic (Minimum 10 ETB)
             const moveBtn = document.getElementById('move-btn');
@@ -490,11 +530,13 @@
                 moveBtn.disabled = false;
                 moveBtn.style.opacity = '1';
                 moveBtn.style.cursor = 'pointer';
+                moveBtn.style.background = 'linear-gradient(135deg, #00c853, #009624)';
                 moveBtn.innerText = 'Move to Wallet';
             } else {
                 moveBtn.disabled = true;
                 moveBtn.style.opacity = '0.6';
                 moveBtn.style.cursor = 'not-allowed';
+                moveBtn.style.background = '#1e293b';
                 let needed = (10 - state.earningWallet).toFixed(2);
                 moveBtn.innerText = `Earn ${needed} more ETB to unlock`;
             }
@@ -542,6 +584,7 @@
             alert(data.message);
             if (data.success) {
                 state.mainBalance -= amount;
+                state.withdrawn += amount;
                 updateUI();
             }
         }
