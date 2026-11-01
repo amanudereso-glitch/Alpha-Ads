@@ -181,7 +181,6 @@
             font-weight: bold;
         }
 
-        /* 7-Day Chart Placeholder */
         .chart-days {
             display: flex;
             justify-content: space-between;
@@ -227,6 +226,34 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        /* Profile Specific Styles */
+        .ref-box {
+            background: #0b131e;
+            padding: 10px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.05);
+            word-break: break-all;
+        }
+        .ref-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .ref-btn {
+            background: #1e293b;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
         }
 
         .nav-bar {
@@ -305,7 +332,6 @@
                 </div>
             </div>
 
-            <!-- Stats Grid matching design -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">TOTAL EARNED</div>
@@ -325,7 +351,6 @@
                 </div>
             </div>
 
-            <!-- 7-Day Earnings Card -->
             <div class="card" style="margin-top: 15px;">
                 <div class="balance-title" style="margin-bottom: 5px;">7-DAY EARNINGS</div>
                 <div class="chart-days">
@@ -383,19 +408,93 @@
             </div>
         </div>
 
+        <!-- RANKS TAB -->
+        <div id="tab-ranks" class="tab-content hidden">
+            <div class="card" style="text-align: center; padding: 40px 20px;">
+                <h3>Leaderboard & Ranks</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">Top earners will be listed here soon!</p>
+            </div>
+        </div>
+
         <!-- PROFILE / WITHDRAW TAB -->
         <div id="tab-profile" class="tab-content hidden">
+            
+            <!-- AVAILABLE BALANCE CARD -->
+            <div class="card">
+                <div class="balance-title">AVAILABLE BALANCE</div>
+                <div class="balance-amount" id="profile-balance">0.00 ETB</div>
+                <div class="lifetime-text">📈 Lifetime: <span id="profile-lifetime">0.00 ETB</span></div>
+            </div>
+
+            <!-- SNI BALANCE CARD -->
+            <div class="card">
+                <div class="balance-header">
+                    <span class="balance-title">SNI BALANCE</span>
+                    <span style="font-size: 18px; font-weight: bold;">0</span>
+                </div>
+                <div class="stats-grid" style="margin-top: 10px;">
+                    <div class="stat-card" style="background: #0b131e;">
+                        <div class="stat-label">TOTAL EARNED</div>
+                        <div class="stat-value" style="font-size: 14px;">0 Sni</div>
+                    </div>
+                    <div class="stat-card" style="background: #0b131e;">
+                        <div class="stat-label">GAMES PLAYED</div>
+                        <div class="stat-value" style="font-size: 14px;">0</div>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 12px;">Convert Sni to ETB on the Earn page</p>
+            </div>
+
+            <!-- REFER & EARN CARD -->
+            <div class="card">
+                <h3>Refer & Earn</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share your link and earn 3.00 ETB per valid referral.</p>
+                <div class="ref-box">
+                    <span id="ref-link-text">https://t.me/alpha_ads_earn_bot/app?start=12345</span>
+                    <div class="ref-actions">
+                        <button class="ref-btn" onclick="copyRefLink()">📋</button>
+                        <button class="ref-btn" onclick="shareRefLink()">📤</button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: #0b131e;">
+                        <div class="stat-label" style="color: var(--green-color);">VALID REFERRALS</div>
+                        <div class="stat-value" id="valid-ref-count">0 <span style="font-size: 11px; color: var(--text-muted);">paid</span></div>
+                    </div>
+                    <div class="stat-card" style="background: #0b131e;">
+                        <div class="stat-label" style="color: #ffb703;">PENDING</div>
+                        <div class="stat-value" id="pending-ref-count">0 <span style="font-size: 11px; color: var(--text-muted);">invalid/unpaid</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WITHDRAW FUNDS CARD -->
             <div class="card">
                 <h3>Withdraw Funds</h3>
-                <p style="font-size: 12px; color: #ff6b6b; margin-bottom: 15px;">⚠️ Need 30 ads watched & min 50 ETB balance.</p>
+                <div style="font-size: 12px; color: #ff6b6b; margin-bottom: 12px; line-height: 1.5;">
+                    📍 Need 5 referrals to withdraw.<br>
+                    📺 Need 20 ads watched to withdraw.
+                </div>
+
+                <div class="balance-title" style="margin-bottom: 5px;">PAYMENT METHOD</div>
                 <select id="pay-method">
                     <option value="">Select payment method...</option>
                     <option value="Telebirr">Telebirr</option>
                     <option value="CBE">CBE (Commercial Bank of Ethiopia)</option>
                 </select>
-                <input type="text" id="pay-account" placeholder="Enter account details / phone">
-                <input type="number" id="pay-amount" placeholder="Amount (Min 50 ETB)">
-                <button class="btn" style="width: 100%; margin-top: 15px;" onclick="requestWithdraw()">Process Withdrawal</button>
+
+                <div class="balance-title" style="margin: 10px 0 5px 0;">ACCOUNT / WALLET ADDRESS</div>
+                <input type="text" id="pay-account" placeholder="Enter account details">
+
+                <div class="balance-title" style="margin: 10px 0 5px 0;">AMOUNT (ETB)</div>
+                <div style="position: relative;">
+                    <input type="number" id="pay-amount" placeholder="0.00" style="padding-right: 60px;">
+                    <button onclick="setMaxAmount()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--green-color); border: none; color: white; padding: 6px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px;">MAX</button>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Available: <span id="withdraw-available">0.00 ETB</span></div>
+
+                <button class="btn" style="width: 100%; margin-top: 15px; padding: 14px;" onclick="requestWithdraw()">Process Withdrawal</button>
+                <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 10px;">Processed within 24-48 business hours.</div>
             </div>
         </div>
 
@@ -433,9 +532,25 @@
             totalEarned: 0.00,
             withdrawn: 0.00,
             adsWatched: 0,
-            referrals: 0,
+            validReferrals: 0,
+            pendingReferrals: 2, // Pending referral simulation (unpaid/haven't watched ads)
             currency: 'ETB'
         };
+
+        // Set referral link dynamically based on user ID
+        const botUsername = "alpha_ads_earn_bot";
+        const refLink = `https://t.me/${botUsername}/app?start=${user.id}`;
+        document.getElementById('ref-link-text').innerText = refLink;
+
+        function copyRefLink() {
+            navigator.clipboard.writeText(refLink);
+            alert('Referral link copied to clipboard!');
+        }
+
+        function shareRefLink() {
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent('Join Alpha Ads Earn and start making money daily!')}`;
+            window.open(shareUrl, '_blank');
+        }
 
         // Initialize Adsgram (Replace 'YOUR_BLOCK_ID' with your actual Adsgram block ID)
         const adController = window.Adsgram ? window.Adsgram.init({ blockId: "YOUR_BLOCK_ID" }) : null;
@@ -490,6 +605,14 @@
             state.adsWatched += 1;
             state.earningWallet += 0.40;
             state.totalEarned += 0.40;
+            
+            // If user has pending referrals who just became valid by watching ads (simulated rule: valid referral gives 3 ETB)
+            if(state.pendingReferrals > 0 && state.adsWatched >= 1) {
+                state.validReferrals += 1;
+                state.pendingReferrals -= 1;
+                state.mainBalance += 3.00; // 3 ETB per valid referral added to balance
+            }
+
             updateUI();
             alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
         }
@@ -505,6 +628,10 @@
             alert('ገንዘቡ በተሳካ ሁኔታ ወደ ዋናው ባላንስ ተዛውሯል!');
         }
 
+        function setMaxAmount() {
+            document.getElementById('pay-amount').value = state.mainBalance;
+        }
+
         function updateUI() {
             let displayVal = state.mainBalance;
             let currSymbol = state.currency;
@@ -513,15 +640,23 @@
             }
             
             document.getElementById('balance').innerText = displayVal.toFixed(2) + ' ' + currSymbol;
+            document.getElementById('profile-balance').innerText = displayVal.toFixed(2) + ' ' + currSymbol;
             document.getElementById('lifetime-val').innerText = state.totalEarned.toFixed(2) + ' ' + currSymbol;
+            document.getElementById('profile-lifetime').innerText = state.totalEarned.toFixed(2) + ' ' + currSymbol;
+            document.getElementById('withdraw-available').innerText = state.mainBalance.toFixed(2) + ' ETB';
+            
             document.getElementById('total-earned').innerText = state.totalEarned.toFixed(2) + ' ETB';
             document.getElementById('earning-wallet').innerText = state.earningWallet.toFixed(2) + ' ETB';
             document.getElementById('ads-watched').innerText = state.adsWatched;
             document.getElementById('task-ads-count').innerText = state.adsWatched + ' / 30';
-            document.getElementById('ref-count').innerText = state.referrals;
+            
+            const totalRefs = state.validReferrals + state.pendingReferrals;
+            document.getElementById('ref-count').innerText = totalRefs;
+            document.getElementById('valid-ref-count').innerHTML = `${state.validReferrals} <span style="font-size: 11px; color: var(--text-muted);">paid</span>`;
+            document.getElementById('pending-ref-count').innerHTML = `${state.pendingReferrals} <span style="font-size: 11px; color: var(--text-muted);">invalid/unpaid</span>`;
+            
             document.getElementById('withdrawn-val').innerText = state.withdrawn.toFixed(2) + ' ETB';
 
-            // Move to wallet unlock logic (Minimum 10 ETB)
             const moveBtn = document.getElementById('move-btn');
             const moveStatus = document.getElementById('move-status');
             moveStatus.innerText = state.earningWallet.toFixed(2) + ' / 10 ETB';
@@ -552,8 +687,13 @@
                 return;
             }
 
-            if (state.adsWatched < 30) {
-                alert('You must watch at least 30 ads before withdrawing!');
+            if (state.validReferrals < 5) {
+                alert('You need at least 5 valid referrals to withdraw!');
+                return;
+            }
+
+            if (state.adsWatched < 20) {
+                alert('You must watch at least 20 ads before withdrawing!');
                 return;
             }
 
