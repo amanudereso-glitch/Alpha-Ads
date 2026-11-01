@@ -446,7 +446,7 @@
                 <h3>Refer & Earn</h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share your link and earn 3.00 ETB per valid referral.</p>
                 <div class="ref-box">
-                    <span id="ref-link-text">https://t.me/alpha_ads_earn_bot/app?start=12345</span>
+                    <span id="ref-link-text">https://t.me/alpha_ads_earn_bot/app</span>
                     <div class="ref-actions">
                         <button class="ref-btn" onclick="copyRefLink()">📋</button>
                         <button class="ref-btn" onclick="shareRefLink()">📤</button>
@@ -516,6 +516,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userIdFromUrl = urlParams.get('userId');
         const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'RICHARD' };
+        const startParam = tg.initDataUnsafe?.start_param || urlParams.get('startapp');
 
         if(user.username) {
             document.getElementById('username-display').innerText = user.username.toUpperCase();
@@ -533,7 +534,7 @@
         };
 
         const botUsername = "alpha_ads_earn_bot";
-        const refLink = `https://t.me/${botUsername}/app?start=${user.id}`;
+        const refLink = `https://t.me/${botUsername}/app?startapp=${user.id}`;
         document.getElementById('ref-link-text').innerText = refLink;
 
         function copyRefLink() {
@@ -546,10 +547,18 @@
             window.open(shareUrl, '_blank');
         }
 
-        // Fetch User Data from Server (MongoDB)
-        async function fetchUserData() {
+        // Fetch User Data from Server & DB
+        async function initUser() {
             try {
-                const res = await fetch(`/api/user/${user.id}`);
+                const res = await fetch('/api/user/init', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        username: user.username || 'RICHARD',
+                        referrerId: startParam || null
+                    })
+                });
                 const data = await res.json();
                 if (data.success && data.user) {
                     state.mainBalance = data.user.balance || 0;
@@ -562,7 +571,7 @@
                     updateUI();
                 }
             } catch (e) {
-                console.error('Error fetching user data:', e);
+                console.error('Error initializing user:', e);
             }
         }
 
@@ -624,7 +633,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    fetchUserData(); // Refresh stats from MongoDB
+                    initUser();
                     alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
                 }
             } catch (e) {
@@ -694,7 +703,7 @@
 
         async function requestWithdraw() {
             const method = document.getElementById('pay-method').value;
-            const account = document.getElementById('pay-account.value') || document.getElementById('pay-account').value;
+            const account = document.getElementById('pay-account').value;
             const amount = parseFloat(document.getElementById('pay-amount').value);
 
             if (!method || !account || !amount) {
@@ -738,12 +747,11 @@
             const data = await res.json();
             alert(data.message);
             if (data.success) {
-                fetchUserData(); // Refresh from DB
+                initUser();
             }
         }
 
-        // Initial Data Load from MongoDB
-        fetchUserData();
+        initUser();
     </script>
 </body>
 </html>
