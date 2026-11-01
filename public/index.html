@@ -527,8 +527,8 @@
             totalEarned: 0.00,
             withdrawn: 0.00,
             adsWatched: 0,
-            validReferrals: 0, // Reset to 0 properly
-            pendingReferrals: 0, // Reset to 0 properly
+            validReferrals: 0,
+            pendingReferrals: 0,
             currency: 'ETB'
         };
 
@@ -546,7 +546,27 @@
             window.open(shareUrl, '_blank');
         }
 
-        // Adsgram initialized with Block ID: 57309[span_0](start_span)[span_0](end_span)
+        // Fetch User Data from Server (MongoDB)
+        async function fetchUserData() {
+            try {
+                const res = await fetch(`/api/user/${user.id}`);
+                const data = await res.json();
+                if (data.success && data.user) {
+                    state.mainBalance = data.user.balance || 0;
+                    state.earningWallet = data.user.earningWallet || 0;
+                    state.totalEarned = data.user.totalEarned || 0;
+                    state.withdrawn = data.user.withdrawn || 0;
+                    state.adsWatched = data.user.adsWatched || 0;
+                    state.validReferrals = data.user.validReferrals || 0;
+                    state.pendingReferrals = data.user.pendingReferrals || 0;
+                    updateUI();
+                }
+            } catch (e) {
+                console.error('Error fetching user data:', e);
+            }
+        }
+
+        // Adsgram initialized with Block ID: 57309
         const adController = window.Adsgram ? window.Adsgram.init({ blockId: "57309" }) : null;
 
         async function checkMembership() {
@@ -595,13 +615,21 @@
             }
         }
 
-        function processAdReward() {
-            state.adsWatched += 1;
-            state.earningWallet += 0.40;
-            state.totalEarned += 0.40;
-            
-            updateUI();
-            alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
+        async function processAdReward() {
+            try {
+                const res = await fetch('/api/update-activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, adWatched: true })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    fetchUserData(); // Refresh stats from MongoDB
+                    alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
+                }
+            } catch (e) {
+                console.error('Error updating ad reward:', e);
+            }
         }
 
         function moveToMainWallet() {
@@ -666,7 +694,7 @@
 
         async function requestWithdraw() {
             const method = document.getElementById('pay-method').value;
-            const account = document.getElementById('pay-account').value;
+            const account = document.getElementById('pay-account.value') || document.getElementById('pay-account').value;
             const amount = parseFloat(document.getElementById('pay-amount').value);
 
             if (!method || !account || !amount) {
@@ -710,13 +738,12 @@
             const data = await res.json();
             alert(data.message);
             if (data.success) {
-                state.mainBalance -= amount;
-                state.withdrawn += amount;
-                updateUI();
+                fetchUserData(); // Refresh from DB
             }
         }
 
-        updateUI();
+        // Initial Data Load from MongoDB
+        fetchUserData();
     </script>
 </body>
 </html>
