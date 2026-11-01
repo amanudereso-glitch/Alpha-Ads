@@ -7,12 +7,13 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0d1b2a;
-            --card-bg: #1b263b;
-            --blue-primary: #0077b6;
-            --blue-hover: #0096c7;
+            --bg-color: #0b131e;
+            --card-bg: #141f30;
+            --blue-primary: #0084ff;
+            --blue-hover: #0095ff;
             --text-color: #ffffff;
-            --text-muted: #90e0ef;
+            --text-muted: #8b9bb4;
+            --green-color: #00c853;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,63 +28,196 @@
         }
         .container {
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
+            max-width: 420px;
+            padding: 15px;
             box-sizing: border-box;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
         .hidden { display: none !important; }
+        
+        /* Top Header Bar */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 5px 0;
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .header-icons {
+            display: flex;
+            gap: 10px;
+        }
+        .icon-btn {
+            background: var(--card-bg);
+            border: none;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Cards */
         .card {
             background-color: var(--card-bg);
-            border-radius: 15px;
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.03);
         }
-        h1, h2, h3 { margin-top: 0; }
+        
+        .balance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .balance-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        /* Currency Toggle */
+        .toggle-container {
+            background: #0b131e;
+            display: flex;
+            border-radius: 20px;
+            padding: 2px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .toggle-btn.active {
+            background: var(--green-color);
+            color: white;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 5px 0 15px 0;
+        }
+
+        /* Action Buttons Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
         .btn {
-            background: linear-gradient(135deg, var(--blue-primary), var(--blue-hover));
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: bold;
-            width: 100%;
             cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-color);
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .btn:active { transform: scale(0.98); }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Inputs & Select */
         input, select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 8px 0;
-            background: #0d1b2a;
-            border: 1px solid var(--blue-primary);
+            background: #0b131e;
+            border: 1px solid rgba(255,255,255,0.1);
             color: white;
-            border-radius: 8px;
+            border-radius: 12px;
             box-sizing: border-box;
+            font-size: 14px;
         }
+        input:focus, select:focus {
+            border-color: var(--blue-primary);
+            outline: none;
+        }
+
+        /* Navigation Bar */
         .nav-bar {
             position: fixed;
             bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background: var(--card-bg);
             display: flex;
             justify-content: space-around;
             padding: 12px 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            box-sizing: border-box;
         }
         .nav-item {
             color: var(--text-muted);
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
         .nav-item.active {
-            color: var(--blue-hover);
+            color: var(--green-color);
             font-weight: bold;
         }
     </style>
@@ -92,30 +226,64 @@
 
     <!-- Channel Join Check Screen -->
     <div id="join-screen" class="container">
-        <div class="card" style="text-align: center; margin-top: 50px;">
+        <div class="card" style="text-align: center; margin-top: 80px; padding: 30px 20px;">
             <h2>Alpha Ads Earn</h2>
-            <p>You need to join our channel to access the app.</p>
-            <a href="https://t.me/alpha_ads_earn" target="_blank">
-                <button class="btn">Join Channel</button>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">You need to join our channel to access the app and start earning.</p>
+            <a href="https://t.me/alpha_ads_earn" target="_blank" style="text-decoration: none;">
+                <button class="btn" style="width: 100%; margin-bottom: 10px;">Join Channel</button>
             </a>
-            <button class="btn" style="background: #2b2d42; margin-top: 10px;" onclick="checkMembership()">✓ I Joined</button>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="checkMembership()">✓ I Joined</button>
         </div>
     </div>
 
     <!-- Main App Screen -->
     <div id="app-screen" class="container hidden">
         
+        <!-- Top Header matching design -->
+        <div class="top-header">
+            <div class="user-badge">
+                🏛 ∇ <span id="username-display">RICHARD</span> ∇ $
+            </div>
+            <div class="header-icons">
+                <button class="icon-btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💬</button>
+                <button class="icon-btn" onclick="alert('Settings & Info')">⚙️</button>
+            </div>
+        </div>
+
         <!-- HOME TAB -->
         <div id="tab-home" class="tab-content">
             <div class="card">
-                <h3>Total Balance</h3>
-                <h1 id="balance">8.00 ETB</h1>
-                <p>Today's Ads Watched: <span id="ads-watched">0</span>/30</p>
+                <div class="balance-header">
+                    <span class="balance-title">TOTAL EARNING BALANCE</span>
+                    <div class="toggle-container">
+                        <button class="toggle-btn active" id="btn-etb" onclick="setCurrency('ETB')">ETB</button>
+                        <button class="toggle-btn" id="btn-usdt" onclick="setCurrency('USDT')">USDT</button>
+                    </div>
+                </div>
+                <div class="balance-amount" id="balance">0.00 ETB</div>
+                <div class="action-grid">
+                    <button class="btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💳 Withdraw</button>
+                    <button class="btn btn-secondary" onclick="alert('No transaction history yet.')">📜 History</button>
+                </div>
             </div>
-            <div class="card">
-                <h3>Quick Stats</h3>
-                <p>Referrals: <span id="ref-count">0</span></p>
-                <p>Minimum Withdraw: 50 ETB</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL EARNED</div>
+                    <div class="stat-value" id="total-earned">0.00 ETB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">TODAY'S ADS</div>
+                    <div class="stat-value" id="ads-watched">0 / 30</div>
+                </div>
+                <div class="stat-card" style="margin-top: 12px;">
+                    <div class="stat-label">REFERRALS</div>
+                    <div class="stat-value" id="ref-count">2</div>
+                </div>
+                <div class="stat-card" style="margin-top: 12px;">
+                    <div class="stat-label">WITHDRAWN</div>
+                    <div class="stat-value">0.00 ETB</div>
+                </div>
             </div>
         </div>
 
@@ -123,8 +291,8 @@
         <div id="tab-tasks" class="tab-content hidden">
             <div class="card">
                 <h3>Watch Ads & Earn</h3>
-                <p>Earn 0.40 ETB per ad watched.</p>
-                <button class="btn" onclick="watchAd()">Watch Ad</button>
+                <p style="color: var(--text-muted); font-size: 13px;">Earn 0.40 ETB per ad watched. Minimum 30 ads required for withdrawal.</p>
+                <button class="btn" style="width: 100%; margin-top: 15px;" onclick="watchAd()">▶ Watch Ad</button>
             </div>
         </div>
 
@@ -132,35 +300,49 @@
         <div id="tab-profile" class="tab-content hidden">
             <div class="card">
                 <h3>Withdraw Funds</h3>
-                <p style="font-size: 13px; color: #ff6b6b;">⚠️ Need 30 ads watched & min 50 ETB.</p>
+                <p style="font-size: 12px; color: #ff6b6b; margin-bottom: 15px;">⚠️ Need 30 ads watched & min 50 ETB balance.</p>
                 <select id="pay-method">
                     <option value="">Select payment method...</option>
                     <option value="Telebirr">Telebirr</option>
-                    <option value="CBE">CBE (Commercial Bank)</option>
+                    <option value="CBE">CBE (Commercial Bank of Ethiopia)</option>
                 </select>
                 <input type="text" id="pay-account" placeholder="Enter account details / phone">
                 <input type="number" id="pay-amount" placeholder="Amount (Min 50 ETB)">
-                <button class="btn" onclick="requestWithdraw()">Process Withdrawal</button>
+                <button class="btn" style="width: 100%; margin-top: 15px;" onclick="requestWithdraw()">Process Withdrawal</button>
             </div>
         </div>
 
         <!-- NAVIGATION BAR -->
         <div class="nav-bar">
-            <div class="nav-item active" onclick="switchTab('home', this)">Home</div>
-            <div class="nav-item" onclick="switchTab('tasks', this)">Tasks</div>
-            <div class="nav-item" onclick="switchTab('profile', this)">Profile</div>
+            <div class="nav-item active" onclick="switchTab('home', this)">
+                <span>🏠</span> Home
+            </div>
+            <div class="nav-item" onclick="switchTab('tasks', this)">
+                <span>📋</span> Tasks
+            </div>
+            <div class="nav-item" onclick="switchTab('profile', this)">
+                <span>👤</span> Profile
+            </div>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const user = tg.initDataUnsafe?.user || { id: 12345678, username: 'testuser' };
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdFromUrl = urlParams.get('userId');
+        const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'RICHARD' };
+
+        if(user.username) {
+            document.getElementById('username-display').innerText = user.username.toUpperCase();
+        }
 
         let state = {
-            balance: 8.00,
+            balance: 0.00,
+            earned: 0.00,
             adsWatched: 0,
-            referrals: 2
+            referrals: 2,
+            currency: 'ETB'
         };
 
         async function checkMembership() {
@@ -174,7 +356,6 @@
                     alert('Please join the channel first!');
                 }
             } catch (e) {
-                // Bypass for local testing if needed
                 document.getElementById('join-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
             }
@@ -187,16 +368,30 @@
             el.classList.add('active');
         }
 
+        function setCurrency(curr) {
+            state.currency = curr;
+            document.getElementById('btn-etb').classList.toggle('active', curr === 'ETB');
+            document.getElementById('btn-usdt').classList.toggle('active', curr === 'USDT');
+            updateUI();
+        }
+
         function watchAd() {
             state.adsWatched += 1;
             state.balance += 0.40;
+            state.earned += 0.40;
             updateUI();
             alert('Ad watched successfully! 0.40 ETB added.');
         }
 
         function updateUI() {
-            document.getElementById('balance').innerText = state.balance.toFixed(2) + ' ETB';
-            document.getElementById('ads-watched').innerText = state.adsWatched;
+            let displayVal = state.balance;
+            let currSymbol = state.currency;
+            if(state.currency === 'USDT') {
+                displayVal = state.balance / 120; // approximate conversion or raw value
+            }
+            document.getElementById('balance').innerText = displayVal.toFixed(2) + ' ' + currSymbol;
+            document.getElementById('total-earned').innerText = state.earned.toFixed(2) + ' ETB';
+            document.getElementById('ads-watched').innerText = state.adsWatched + ' / 30';
             document.getElementById('ref-count').innerText = state.referrals;
         }
 
