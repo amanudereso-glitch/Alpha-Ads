@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Ads Earn</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1b2a;
+            --card-bg: #1b263b;
+            --blue-primary: #0077b6;
+            --blue-hover: #0096c7;
+            --text-color: #ffffff;
+            --text-muted: #90e0ef;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            padding-bottom: 80px;
+        }
+        .hidden { display: none !important; }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        h1, h2, h3 { margin-top: 0; }
+        .btn {
+            background: linear-gradient(135deg, var(--blue-primary), var(--blue-hover));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn:active { transform: scale(0.98); }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: #0d1b2a;
+            border: 1px solid var(--blue-primary);
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-item {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: var(--blue-hover);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Channel Join Check Screen -->
+    <div id="join-screen" class="container">
+        <div class="card" style="text-align: center; margin-top: 50px;">
+            <h2>Alpha Ads Earn</h2>
+            <p>You need to join our channel to access the app.</p>
+            <a href="https://t.me/alpha_ads_earn" target="_blank">
+                <button class="btn">Join Channel</button>
+            </a>
+            <button class="btn" style="background: #2b2d42; margin-top: 10px;" onclick="checkMembership()">✓ I Joined</button>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="container hidden">
+        
+        <!-- HOME TAB -->
+        <div id="tab-home" class="tab-content">
+            <div class="card">
+                <h3>Total Balance</h3>
+                <h1 id="balance">8.00 ETB</h1>
+                <p>Today's Ads Watched: <span id="ads-watched">0</span>/30</p>
+            </div>
+            <div class="card">
+                <h3>Quick Stats</h3>
+                <p>Referrals: <span id="ref-count">0</span></p>
+                <p>Minimum Withdraw: 50 ETB</p>
+            </div>
+        </div>
+
+        <!-- TASKS TAB -->
+        <div id="tab-tasks" class="tab-content hidden">
+            <div class="card">
+                <h3>Watch Ads & Earn</h3>
+                <p>Earn 0.40 ETB per ad watched.</p>
+                <button class="btn" onclick="watchAd()">Watch Ad</button>
+            </div>
+        </div>
+
+        <!-- PROFILE / WITHDRAW TAB -->
+        <div id="tab-profile" class="tab-content hidden">
+            <div class="card">
+                <h3>Withdraw Funds</h3>
+                <p style="font-size: 13px; color: #ff6b6b;">⚠️ Need 30 ads watched & min 50 ETB.</p>
+                <select id="pay-method">
+                    <option value="">Select payment method...</option>
+                    <option value="Telebirr">Telebirr</option>
+                    <option value="CBE">CBE (Commercial Bank)</option>
+                </select>
+                <input type="text" id="pay-account" placeholder="Enter account details / phone">
+                <input type="number" id="pay-amount" placeholder="Amount (Min 50 ETB)">
+                <button class="btn" onclick="requestWithdraw()">Process Withdrawal</button>
+            </div>
+        </div>
+
+        <!-- NAVIGATION BAR -->
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="switchTab('home', this)">Home</div>
+            <div class="nav-item" onclick="switchTab('tasks', this)">Tasks</div>
+            <div class="nav-item" onclick="switchTab('profile', this)">Profile</div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        const user = tg.initDataUnsafe?.user || { id: 12345678, username: 'testuser' };
+
+        let state = {
+            balance: 8.00,
+            adsWatched: 0,
+            referrals: 2
+        };
+
+        async function checkMembership() {
+            try {
+                const res = await fetch(`/api/verify/${user.id}`);
+                const data = await res.json();
+                if (data.joined) {
+                    document.getElementById('join-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                } else {
+                    alert('Please join the channel first!');
+                }
+            } catch (e) {
+                // Bypass for local testing if needed
+                document.getElementById('join-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+            }
+        }
+
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            el.classList.add('active');
+        }
+
+        function watchAd() {
+            state.adsWatched += 1;
+            state.balance += 0.40;
+            updateUI();
+            alert('Ad watched successfully! 0.40 ETB added.');
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = state.balance.toFixed(2) + ' ETB';
+            document.getElementById('ads-watched').innerText = state.adsWatched;
+            document.getElementById('ref-count').innerText = state.referrals;
+        }
+
+        async function requestWithdraw() {
+            const method = document.getElementById('pay-method').value;
+            const account = document.getElementById('pay-account').value;
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+
+            if (!method || !account || !amount) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            if (state.adsWatched < 30) {
+                alert('You must watch at least 30 ads before withdrawing!');
+                return;
+            }
+
+            if (amount < 50) {
+                alert('Minimum withdrawal amount is 50 ETB!');
+                return;
+            }
+
+            if (amount > state.balance) {
+                alert('Insufficient balance!');
+                return;
+            }
+
+            const res = await fetch('/api/withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    username: user.username,
+                    amount: amount,
+                    adsWatched: state.adsWatched,
+                    method: method,
+                    account: account
+                })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            if (data.success) {
+                state.balance -= amount;
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
