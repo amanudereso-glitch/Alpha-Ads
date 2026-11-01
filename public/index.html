@@ -260,10 +260,10 @@
         
         <div class="top-header">
             <div class="user-badge">
-                🏛 ∇ <span id="username-display">RICHARD</span> ∇ $
+                🏛 ∇ <span id="username-display">AMAN_ORGINALL_1</span> ∇ $
             </div>
             <div class="header-icons">
-                <button class="icon-btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[3])">💬</button>
+                <button class="icon-btn" onclick="switchTab('profile', document.querySelectorAll('.nav-item')[2])">💬</button>
                 <button class="icon-btn" onclick="alert('Settings & Info')">⚙️</button>
             </div>
         </div>
@@ -296,7 +296,7 @@
                 </div>
                 <div class="stat-card" style="margin-top: 12px;">
                     <div class="stat-label">REFERRALS</div>
-                    <div class="stat-value" id="ref-count">2</div>
+                    <div class="stat-value" id="ref-count">0</div>
                 </div>
                 <div class="stat-card" style="margin-top: 12px;">
                     <div class="stat-label">WITHDRAWN</div>
@@ -330,9 +330,11 @@
                 <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px;">Minimum: 10 ETB</div>
             </div>
 
+            <!-- Watch Ads Section -->
             <div class="card">
                 <div style="font-weight: bold; margin-bottom: 4px;">Watch Ads and Earn</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">0.40 ETB per ad</div>
+                
                 <div class="task-item-box">
                     <div style="font-size: 13px;">
                         <div style="font-weight: bold;">Watch Ads and Earn</div>
@@ -340,6 +342,11 @@
                     </div>
                     <div class="badge-ready" onclick="watchAd()">READY</div>
                 </div>
+
+                <!-- Big Main Watch Ads Button -->
+                <button class="btn btn-green" style="width: 100%; margin-top: 15px; padding: 14px; font-size: 16px;" onclick="watchAd()">
+                    ▶ Watch Ads
+                </button>
             </div>
         </div>
 
@@ -378,7 +385,7 @@
         tg.expand();
         const urlParams = new URLSearchParams(window.location.search);
         const userIdFromUrl = urlParams.get('userId');
-        const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'RICHARD' };
+        const user = tg.initDataUnsafe?.user || { id: userIdFromUrl || 12345678, username: 'AMAN_ORGINALL_1' };
 
         if(user.username) {
             document.getElementById('username-display').innerText = user.username.toUpperCase();
@@ -389,7 +396,7 @@
             earningWallet: 0.00,
             totalEarned: 0.00,
             adsWatched: 0,
-            referrals: 2,
+            referrals: 0,
             currency: 'ETB'
         };
 
