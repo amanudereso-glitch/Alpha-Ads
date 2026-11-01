@@ -39,51 +39,37 @@ const User = mongoose.model('User', userSchema);
 // Telegram Bot Setup
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
-bot.onText(/\/start(?:\s+(.+))?/, async (msg, match) => {
+bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    const username = msg.from.username || msg.from.first_name;
-    const startParam = match[1]; // Referrer ID if exists
+    bot.sendMessage(chatId, `Welcome to Alpha Ads Earn! 🚀\n\nClick below to start earning ETB by watching ads and inviting friends.`, {
+        reply_markup: {
+            inline_keyboard: [
+                [{ text: '🚀 Open Mini App', web_app: { url: `https://alpha-ads.onrender.com?userId=${userId}` } }],
+                [{ text: '📢 Join Channel', url: `https://t.me/alpha_ads_earn` }]
+            ]
+        }
+    });
+});
 
+// API: Init / Get User Data & Handle Referrals
+app.post('/api/user/init', async (req, res) => {
     try {
+        const { userId, username, referrerId } = req.body;
         let user = await User.findOne({ userId });
+        
         if (!user) {
-            user = new User({ userId, username });
-            
-            // If referred by someone
-            if (startParam && parseInt(startParam) !== userId) {
-                const referrer = await User.findOne({ userId: parseInt(startParam) });
+            user = new User({ userId, username: username || 'USER' });
+
+            // If referred by someone valid
+            if (referrerId && parseInt(referrerId) !== userId) {
+                const referrer = await User.findOne({ userId: parseInt(referrerId) });
                 if (referrer) {
                     user.referredBy = referrer.userId;
                     referrer.pendingReferrals += 1; // Add to referrer's pending
                     await referrer.save();
                 }
             }
-            await user.save();
-        }
-
-        const webAppUrl = `https://${msg.chat.title ? 'app' : 'alpha-ads'}.onrender.com?userId=${userId}`; // or your render domain
-        
-        bot.sendMessage(chatId, `Welcome to Alpha Ads Earn! 🚀\n\nClick below to start earning ETB by watching ads and inviting friends.`, {
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: '🚀 Open Mini App', web_app: { url: `https://alpha-ads.onrender.com?userId=${userId}` } }],
-                    [{ text: '📢 Join Channel', url: `https://t.me/alpha_ads_earn` }]
-                ]
-            }
-        });
-    } catch (e) {
-        console.error('Start command error:', e);
-    }
-});
-
-// API: Get User Data
-app.get('/api/user/:userId', async (req, res) => {
-    try {
-        const userId = req.params.userId;
-        let user = await User.findOne({ userId });
-        if (!user) {
-            user = new User({ userId });
             await user.save();
         }
         res.json({ success: true, user });
@@ -100,12 +86,11 @@ app.get('/api/verify/:userId', async (req, res) => {
         const isMember = ['member', 'administrator', 'creator'].includes(chatMember.status);
         res.json({ joined: isMember });
     } catch (e) {
-        // If bot is not admin in channel, fallback to true for testing or handle error
         res.json({ joined: true });
     }
 });
 
-// API: Update User Stats (Watch Ad / Referrals)
+// API: Update User Stats (Watch Ad)
 app.post('/api/update-activity', async (req, res) => {
     try {
         const { userId, adWatched } = req.body;
@@ -123,7 +108,7 @@ app.post('/api/update-activity', async (req, res) => {
                 if (referrer && referrer.pendingReferrals > 0) {
                     referrer.pendingReferrals -= 1;
                     referrer.validReferrals += 1;
-                    referrer.balance += 3.00; // 3 ETB reward for valid referral
+                    referrer.balance += 3.00; // 3 ETB reward
                     await referrer.save();
                 }
             }
@@ -143,7 +128,7 @@ app.post('/api/withdraw', async (req, res) => {
         let user = await User.findOne({ userId });
 
         if (!user || user.balance < amount) {
-            return.json({ success: false, message: 'Insufficient balance!' });
+            return res.json({ success: false, message: 'Insufficient balance!' });
         }
 
         user.balance -= amount;
