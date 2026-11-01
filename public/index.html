@@ -527,8 +527,8 @@
             totalEarned: 0.00,
             withdrawn: 0.00,
             adsWatched: 0,
-            validReferrals: 0,
-            pendingReferrals: 2,
+            validReferrals: 0, // Reset to 0 properly
+            pendingReferrals: 0, // Reset to 0 properly
             currency: 'ETB'
         };
 
@@ -546,7 +546,7 @@
             window.open(shareUrl, '_blank');
         }
 
-        // Adsgram initialized with Block ID: 57309
+        // Adsgram initialized with Block ID: 57309[span_0](start_span)[span_0](end_span)
         const adController = window.Adsgram ? window.Adsgram.init({ blockId: "57309" }) : null;
 
         async function checkMembership() {
@@ -600,12 +600,6 @@
             state.earningWallet += 0.40;
             state.totalEarned += 0.40;
             
-            if(state.pendingReferrals > 0 && state.adsWatched >= 1) {
-                state.validReferrals += 1;
-                state.pendingReferrals -= 1;
-                state.mainBalance += 3.00;
-            }
-
             updateUI();
             alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
         }
