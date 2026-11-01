@@ -1,13 +1,17 @@
 {
   "name": "alpha-ads-earn",
   "version": "1.0.0",
-  "description": "Telegram Mini App for Alpha Ads Earn",
+  "description": "Alpha Ads Earn Telegram Mini App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "node-telegram-bot-api": "^0.66.0"
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0",
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
