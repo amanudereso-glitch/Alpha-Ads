@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alpha Ads Earn</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Adsgram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #070b12 0%, #0f172a 100%);
@@ -311,73 +313,9 @@
             color: #00e676;
             font-weight: 700;
         }
-
-        /* Adsterra 3-Step Modal Styles */
-        #ad-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(7, 11, 18, 0.92);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .ad-modal-box {
-            width: 100%;
-            max-width: 360px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.5);
-            backdrop-filter: blur(16px);
-        }
-        .close-ad-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: none; /* Shown only after 3 ads finish */
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            border: 1px solid var(--card-border);
-            transition: transform 0.2s;
-        }
-        .close-ad-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
-
-    <!-- ADSTERRA 3-STEP AD MODAL -->
-    <div id="ad-modal" class="hidden">
-        <div class="ad-modal-box">
-            <div class="close-ad-btn" id="close-ad-btn" onclick="closeAdModal()">×</div>
-            <h3 style="margin-top: 0; color: #00e676; font-size: 18px;">Watch Ads & Earn</h3>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
-                Ad Step: <span id="ad-step-num" style="color: white; font-weight: 700;">1</span> / 3
-            </p>
-            <div style="background: rgba(11, 19, 30, 0.8); padding: 14px; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--card-border); font-size: 12px; color: var(--text-muted);">
-                Click below to view the sponsor ad. Complete all 3 steps to unlock your reward!
-            </div>
-            <button class="btn" id="ad-next-btn" style="width: 100%; padding: 14px;" onclick="handleAdStep()">🔗 Open Ad</button>
-            <div id="ad-status-msg" style="font-size: 11px; color: var(--text-muted); margin-top: 12px;"></div>
-        </div>
-    </div>
 
     <!-- Main App Screen -->
     <div id="app-screen" class="container">
@@ -471,17 +409,17 @@
 
             <div class="card">
                 <div style="font-weight: 700; margin-bottom: 4px; font-size: 14px;">Watch Ads and Earn</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">0.40 ETB per ad session (3 ads)</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">0.40 ETB per ad</div>
                 
                 <div class="task-item-box">
                     <div style="font-size: 12px;">
                         <div style="font-weight: 700;">Watch Ads and Earn</div>
-                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Adsterra Direct • 0.40 ETB</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Adsgram Network • 0.40 ETB</div>
                     </div>
-                    <div class="badge-ready" onclick="startWatchAdsFlow()">READY</div>
+                    <div class="badge-ready" onclick="watchAd()">READY</div>
                 </div>
 
-                <button class="btn" style="width: 100%; margin-top: 16px; padding: 14px; font-size: 15px;" onclick="startWatchAdsFlow()">
+                <button class="btn" style="width: 100%; margin-top: 16px; padding: 14px; font-size: 15px;" onclick="watchAd()">
                     ▶ Watch Ads
                 </button>
             </div>
@@ -655,6 +593,9 @@
             }
         }
 
+        // Adsgram Controller Initialization (Block ID: 57414)
+        const adController = window.Adsgram ? window.Adsgram.init({ blockId: "57414" }) : null;
+
         function switchTab(tabName, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -671,47 +612,19 @@
             updateUI();
         }
 
-        // Adsterra 3-Step Ad Flow Logic
-        let currentAdStep = 1;
-        const totalAdSteps = 3;
-        // Adsterra Smartlink (ID: 32044857)
-        const adsterraLink = "https://www.highperformanceformat.com/32044857";
+        async function watchAd() {
+            if (!adController) {
+                alert('Adsgram SDK is not loaded. Please check your internet connection.');
+                return;
+            }
 
-        function startWatchAdsFlow() {
-            currentAdStep = 1;
-            document.getElementById('ad-step-num').innerText = currentAdStep;
-            document.getElementById('close-ad-btn').style.display = 'none';
-            document.getElementById('ad-next-btn').innerText = "🔗 Open Sponsor Ad (1/3)";
-            document.getElementById('ad-status-msg').innerText = "Please complete all 3 ad steps to receive your reward.";
-            document.getElementById('ad-modal').classList.remove('hidden');
-        }
-
-        function handleAdStep() {
-            // Open Adsterra link in a new tab/window
-            window.open(adsterraLink, '_blank');
-
-            document.getElementById('ad-status-msg').innerText = `Ad ${currentAdStep} viewed! Verifying...`;
-
-            setTimeout(() => {
-                if (currentAdStep < totalAdSteps) {
-                    currentAdStep++;
-                    document.getElementById('ad-step-num').innerText = currentAdStep;
-                    document.getElementById('ad-next-btn').innerText = `🔗 Open Sponsor Ad (${currentAdStep}/3)`;
-                    document.getElementById('ad-status-msg').innerText = `Step ${currentAdStep - 1} completed. Click for next ad!`;
-                } else {
-                    // All 3 steps finished! Show Close (×) button and process reward
-                    document.getElementById('ad-step-num').innerText = "3";
-                    document.getElementById('ad-next-btn').style.display = 'none';
-                    document.getElementById('close-ad-btn').style.display = 'flex';
-                    document.getElementById('ad-status-msg').innerHTML = "<span style='color: #00e676; font-weight: 700;'>All 3 ads completed successfully! Click (×) to claim reward.</span>";
-                    processAdReward();
-                }
-            }, 2500);
-        }
-
-        function closeAdModal() {
-            document.getElementById('ad-modal').classList.add('hidden');
-            document.getElementById('ad-next-btn').style.display = 'block';
+            try {
+                // Trigger Adsgram In-App Popup Modal with Timer
+                await adController.show();
+                processAdReward();
+            } catch (error) {
+                alert('ማስታወቂያውን እስከ መጨረሻው አልጨረሱም ወይም ማስታወቂያ ማሳየት አልተቻለም!');
+            }
         }
 
         async function processAdReward() {
@@ -724,6 +637,7 @@
                 const data = await res.json();
                 if (data.success) {
                     initUser();
+                    alert('ማስታወቂያው በተሳካ ሁኔታ ታይቷል! 0.40 ETB ወደ Earning Wallet ተጨምሯል።');
                 }
             } catch (e) {
                 console.error('Error updating ad reward:', e);
